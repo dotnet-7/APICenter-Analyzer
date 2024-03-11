@@ -1,6 +1,8 @@
 #!/bin/bash
 
 echo "Configuring EventGrid subscription for API Center"
+
+# Sleep for 2 minutes to allow the function app to be deployed
 sleep 120
 
 functionID=$(az functionapp function show --name ${AZURE_FUNCTION_NAME} \

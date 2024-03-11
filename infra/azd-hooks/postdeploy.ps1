@@ -1,6 +1,7 @@
 # PowerShell syntax
 echo "Configuring EventGrid subscription for API Center"
 
+# Sleep for 2 minutes to allow the function app to be deployed
 Start-Sleep -s 120
 
 $output = azd env get-values  
