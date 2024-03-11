@@ -19,8 +19,17 @@ resource api 'Microsoft.ApiCenter/services/workspaces/apis@2024-03-01' = {
   parent: workspace
   name: apiName
   properties: {
-    kind:'rest'
+    kind: 'rest'
     title: apiName
+  }
+}
+
+resource version 'Microsoft.ApiCenter/services/workspaces/apis/versions@2024-03-01' = {
+  parent: api
+  name: 'v1'
+  properties: {
+    title: 'v1'
+    lifecycleStage: 'Design'
   }
 }
 

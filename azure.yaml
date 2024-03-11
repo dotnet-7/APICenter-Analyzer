@@ -10,7 +10,13 @@ services:
     host: function
 hooks:
   postdeploy:
-    shell: pwsh
-    run: infra/azd-hooks/postdeploy.ps1
-    interactive: false
-    continueOnError: false
+    posix:
+      shell: sh
+      run: infra/azd-hooks/postdeploy.sh
+      interactive: false
+      continueOnError: false
+    windows:
+      shell: pwsh
+      run: infra/azd-hooks/postdeploy.ps1
+      interactive: false
+      continueOnError: false

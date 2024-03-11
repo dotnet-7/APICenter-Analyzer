@@ -47,6 +47,50 @@ Before you get started, make sure you have the following requirements in place:
 - The [Azure Functions extension v1.10.4](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) or above for Visual Studio Code.
 - [Azure Functions Core Tools v4.0.5382 or above](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript#install-the-azure-functions-core-tools).
 
+### Running the sample using the Azure Developer CLI (azd)
+
+The Azure Developer CLI (`azd`) is a developer-centric command-line interface (CLI) tool for creating Azure applications.
+
+You need to install it before running and deploying with the Azure Developer CLI.
+
+### Windows
+
+```powershell
+powershell -ex AllSigned -c "Invoke-RestMethod 'https://aka.ms/install-azd.ps1' | Invoke-Expression"
+```
+
+### Linux/MacOS
+
+```
+curl -fsSL https://aka.ms/install-azd.sh | bash
+```
+
+After logging in with the following command, you will be able to use the `azd` cli to quickly provision and deploy the application.
+
+```
+azd auth login
+```
+
+Then, execute the `azd init` command to initialize the environment (You do not need to run this command if you already have the code or have opened this in a Codespace or DevContainer).
+```
+azd init -t https://github.com/Azure/APICenter-Analyzer
+```
+Enter an environment name.
+
+**Notes:** the default auth type uses keys, if you want to switch to rbac, please run `azd env set AUTH_TYPE rbac`.
+```
+azd env set AUTH_TYPE rbac
+```
+
+Then, run `azd up` to provision all the resources to Azure and deploy the code to those resources.
+```
+azd up 
+```
+
+Select your desired `subscription` and `location`. Then choose a resource group or create a new resource group. Wait a moment for the resource deployment to complete. Then you can upload your own api definition for test.
+
+You can also run the sample directly locally (See below).
+
 ### 🔧 Configure & run your function locally
 
 - Clone the APICenter-Analyzer repository to your local machine <TODO: insert link>
