@@ -7,6 +7,7 @@
   - 💼 API Analysis in Azure API Center (Overview)
 - 🚀 [How to Run](./#-how-to-run-api-analysis)
   - 🔧 Configure your environment
+  - 🔧 Running the sample using the Azure Developer CLI (azd)
   - 🔧 Configure & run your function locally
 - ☁️ [How to deploy](./#-how-to-deploy)
 - 📄 [Custom Ruleset](./#-custom-ruleset)
@@ -47,7 +48,7 @@ Before you get started, make sure you have the following requirements in place:
 - The [Azure Functions extension v1.10.4](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) or above for Visual Studio Code.
 - [Azure Functions Core Tools v4.0.5382 or above](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript#install-the-azure-functions-core-tools).
 
-### Running the sample using the Azure Developer CLI (azd)
+### 🔧 Running the sample using the Azure Developer CLI (azd)
 
 The Azure Developer CLI (`azd`) is a developer-centric command-line interface (CLI) tool for creating Azure applications.
 
