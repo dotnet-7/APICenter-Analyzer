@@ -69,7 +69,11 @@ curl -fsSL https://aka.ms/install-azd.sh | bash
 After logging in with the following command, you will be able to use the `azd` cli to quickly provision and deploy the application.
 
 ```
+# authenticate to Azure Developer CLI
 azd auth login
+
+# authenticate to Azure CLI
+az login
 ```
 
 Then, execute the `azd init` command to initialize the environment (You do not need to run this command if you already have the code or have opened this in a Codespace or DevContainer).
@@ -77,11 +81,6 @@ Then, execute the `azd init` command to initialize the environment (You do not n
 azd init -t https://github.com/Azure/APICenter-Analyzer
 ```
 Enter an environment name.
-
-**Notes:** the default auth type uses keys, if you want to switch to rbac, please run `azd env set AUTH_TYPE rbac`.
-```
-azd env set AUTH_TYPE rbac
-```
 
 Then, run `azd up` to provision all the resources to Azure and deploy the code to those resources.
 ```
