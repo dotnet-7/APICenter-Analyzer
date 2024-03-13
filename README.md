@@ -84,10 +84,12 @@ Enter an environment name.
 
 Then, run `azd up` to provision all the resources to Azure and deploy the code to those resources.
 ```
-azd up 
+azd up
 ```
 
 Select your desired `subscription` and `location`. Then choose a resource group or create a new resource group. Wait a moment for the resource deployment to complete. Then you can upload your own api definition for test.
+
+> Under Linux, if a postdeploy.sh permission denied error occurs, please run `chmod +x infra/azd-hooks/postdeploy.sh` to add role.
 
 You can also run the sample directly locally (See below).
 
