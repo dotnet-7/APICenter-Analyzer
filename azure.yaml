@@ -5,7 +5,7 @@ metadata:
   template: api-center-analyzer@0.0.1-beta
 services:
   function:
-    project: ./src
+    project: .
     language: ts
     host: function
 hooks:
