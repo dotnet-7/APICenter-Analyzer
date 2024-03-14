@@ -12,11 +12,11 @@ hooks:
   postdeploy:
     posix:
       shell: sh
-      run: infra/azd-hooks/postdeploy.sh
+      run: infra/hooks/postdeploy.sh
       interactive: false
       continueOnError: false
     windows:
       shell: pwsh
-      run: infra/azd-hooks/postdeploy.ps1
+      run: infra/hooks/postdeploy.ps1
       interactive: false
       continueOnError: false
