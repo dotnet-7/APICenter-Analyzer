@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: api-center-analyzer
+metadata:
+  template: api-center-analyzer@0.0.1-beta
+services:
+  function:
+    project: .
+    language: ts
+    host: function
+hooks:
+  postdeploy:
+    posix:
+      shell: sh
+      run: infra/hooks/postdeploy.sh
+      interactive: false
+      continueOnError: false
+    windows:
+      shell: pwsh
+      run: infra/hooks/postdeploy.ps1
+      interactive: false
+      continueOnError: false
