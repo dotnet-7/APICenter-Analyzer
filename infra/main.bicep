@@ -110,7 +110,7 @@ module apiCenterAccess './app/api-center-role.bicep' =
     name: 'apicenteraccess'
     scope: rg
     params: {
-      apiCenterName: createAPIC ? apiCenter.outputs.name : apiCenterName
+      apiCenterName: apiCenter.outputs.name
       principalId: function.outputs.identityPrincipalId
       principalType: 'ServicePrincipal'
     }
@@ -122,7 +122,7 @@ module apiCenterExistAccess './app/api-center-role.bicep' =
     name: 'apicenteraccessexist'
     scope: apiCenterRG
     params: {
-      apiCenterName: createAPIC ? apiCenter.outputs.name : apiCenterName
+      apiCenterName: apiCenterName
       principalId: function.outputs.identityPrincipalId
       principalType: 'ServicePrincipal'
     }
