@@ -9,10 +9,17 @@ param principalId string
   'User'
 ])
 param principalType string = 'ServicePrincipal'
-param roleDefinitionId string
+param apiCenterName string
+
+var roleDefinitionId = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+
+resource apiCenter 'Microsoft.ApiCenter/services@2024-03-01' existing = {
+  name: apiCenterName
+}
 
 resource role 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().id, principalId, roleDefinitionId)
+  name: guid(subscription().id, resourceGroup().id, principalId, roleDefinitionId)
+  scope: apiCenter
   properties: {
     principalId: principalId
     principalType: principalType

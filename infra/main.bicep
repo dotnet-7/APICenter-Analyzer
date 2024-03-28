@@ -9,6 +9,13 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
+@description('Should monitoring resources be provisioned?')
+@allowed([
+  'yes'
+  'no'
+])
+param useMonitoring string
+
 // Optional parameters to override the default azd resource naming conventions. Update the main.parameters.json file to provide values. e.g.,:
 // "resourceGroupName": {
 //      "value": "myGroupName"
@@ -22,10 +29,12 @@ param applicationInsightsName string = ''
 param applicationInsightsDashboardName string = ''
 
 param resourceGroupName string = ''
+param apiCenterResourceGroupName string = ''
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
+var createAPIC = apiCenterName != '' ? false : true
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -33,6 +42,11 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
   tags: tags
 }
+
+resource apiCenterRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing =
+  if (!createAPIC) {
+    name: apiCenterResourceGroupName
+  }
 
 // Create an App Service Plan to group applications under the same payment plan and SKU
 module appServicePlan './core/host/appserviceplan.bicep' = {
@@ -73,46 +87,69 @@ module function './core/host/functions.bicep' = {
     runtimeVersion: '18'
     storageAccountName: storageAccount.outputs.name
     managedIdentity: true
-    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    applicationInsightsName: useMonitoring == 'yes' ? monitoring.outputs.applicationInsightsName : ''
   }
 }
 
 // Create the api center
-module apiCenter './app/api-center.bicep' = {
-  name: 'apicenter'
-  scope: rg
-  params: {
-    name: !empty(apiCenterName) ? apiCenterName : 'apic-${resourceToken}'
-    location: location
-    tags: tags
-    apiName: 'api1'
+module apiCenter './app/api-center.bicep' =
+  if (createAPIC) {
+    name: 'apicenter'
+    scope: rg
+    params: {
+      name: !empty(apiCenterName) ? apiCenterName : 'apic-${resourceToken}'
+      location: location
+      tags: tags
+      apiName: 'api1'
+    }
   }
-}
 
-// Give api center access to the function
-module apiCenterAccess './core/security/role.bicep' = {
-  name: 'apicenteraccess'
-  scope: rg
-  params: {
-    principalId: function.outputs.identityPrincipalId
-    roleDefinitionId: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
-    principalType: 'ServicePrincipal'
+// Give api center access to the function if api center exists
+module apiCenterAccess './app/api-center-role.bicep' =
+  if (createAPIC) {
+    name: 'apicenteraccess'
+    scope: rg
+    params: {
+      apiCenterName: createAPIC ? apiCenter.outputs.name : apiCenterName
+      principalId: function.outputs.identityPrincipalId
+      principalType: 'ServicePrincipal'
+    }
   }
-}
+
+// Give api center access to the function if api center exists
+module apiCenterExistAccess './app/api-center-role.bicep' =
+  if (!createAPIC) {
+    name: 'apicenteraccessexist'
+    scope: apiCenterRG
+    params: {
+      apiCenterName: createAPIC ? apiCenter.outputs.name : apiCenterName
+      principalId: function.outputs.identityPrincipalId
+      principalType: 'ServicePrincipal'
+    }
+  }
 
 // Monitor application with Azure Monitor
-module monitoring './core/monitor/monitoring.bicep' = {
-  name: 'monitoring'
-  scope: rg
-  params: {
-    location: location
-    tags: tags
-    logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
-    applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
-    applicationInsightsDashboardName: !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}'
+module monitoring './core/monitor/monitoring.bicep' =
+  if (useMonitoring == 'yes') {
+    name: 'monitoring'
+    scope: rg
+    params: {
+      location: location
+      tags: tags
+      logAnalyticsName: !empty(logAnalyticsName)
+        ? logAnalyticsName
+        : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
+      applicationInsightsName: !empty(applicationInsightsName)
+        ? applicationInsightsName
+        : '${abbrs.insightsComponents}${resourceToken}'
+      applicationInsightsDashboardName: !empty(applicationInsightsDashboardName)
+        ? applicationInsightsDashboardName
+        : '${abbrs.portalDashboards}${resourceToken}'
+    }
   }
-}
 
 output RESOURCE_GROUP_NAME string = rg.name
-output AZURE_API_CENTER_ID string = apiCenter.outputs.id
+output AZURE_API_CENTER_ID string = createAPIC
+  ? apiCenter.outputs.id
+  : resourceId(subscription().subscriptionId, apiCenterResourceGroupName, 'Microsoft.ApiCenter/services', apiCenterName)
 output AZURE_FUNCTION_NAME string = function.outputs.name
